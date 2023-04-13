@@ -1,6 +1,70 @@
-
 import "./styleAccount.css"
+import { useState } from "react";
+import axios from "axios";
+import Cookies from "js-cookie";
+import jwt_decode from "jwt-decode";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPencil, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
+import Button from 'react-bootstrap/Button';
+import Alert from "react-bootstrap/Alert";
+import { useNavigate } from "react-router-dom";
 function SignInComponent() {
+    const navigate=useNavigate();
+    const [email, setemail] = useState("")
+    const [password, setpassword] = useState("")
+    const [EmailErrorMessage, setEmailErrorMessage] = useState(false)
+    const [PasswordErrorMessage, setPasswordErrorMessage] = useState(false)
+
+
+
+    const login = async () => {
+        await axios.post('http://localhost:5000/loginAdmin', {
+            email: email,
+            password: password,
+        })
+            .then((response) => {
+                Cookies.set("jwt", response.data.token);
+                const jwtCookie = document.cookie
+                    .split("; ")
+                    .find((row) => row.startsWith("jwt="));
+                if (jwtCookie) {
+                    const jwtToken = jwtCookie.split("=")[1];
+                    const decodedToken = jwt_decode(jwtToken);
+                    const id = decodedToken.id;
+                }
+                localStorage.setItem("jwtToken", jwtCookie);
+                const token = localStorage.getItem('jwtToken');
+                if(token){
+                   const idToken=jwt_decode(token).id;
+                   const role=jwt_decode(token).role;
+                   console.log(role)
+                   if(role==="Admin")
+                   {
+                    navigate("/DashboardAdmin")
+                   }
+                   if(role==="SuperAdmin")
+                   {
+                    navigate("/DashboardSuperadmin")
+                   }
+                }
+
+
+            })
+            .catch((error) => {
+                if (error.response.data.errors.ErrorEmail) {
+                    setPasswordErrorMessage(false);
+                    setEmailErrorMessage(true);
+
+                }
+                if (error.response.data.errors.ErrorPassword) {
+                    setEmailErrorMessage(false);
+                    setPasswordErrorMessage(true);
+                }
+
+            })
+
+    }
+
     return (
         <>
             <div className="container position-sticky z-index-sticky top-0">
@@ -76,18 +140,51 @@ function SignInComponent() {
                                         <div className="card-body">
                                             <form role="form">
                                                 <div className="mb-3">
-                                                    <input type="email" className="form-control form-control-lg form-SignIn" placeholder="Email" aria-label="Email" />
+                                                    <input type="email" className="form-control form-control-lg form-SignIn" placeholder="Email" aria-label="Email" name="email" value={email} onChange={(e) => setemail(e.target.value)} required />
                                                 </div>
+                                                {EmailErrorMessage && (
+                                                    <Alert variant="danger" className="mt-1">
+                                                        <div
+                                                            className="form-icon-wrapper"
+                                                            style={{
+                                                                height: "20px",
+                                                                fontSize: "14px",
+                                                                marginTop: "-11px",
+                                                                marginBottom: "-13px",
+                                                                fontWeight: "bold"
+
+                                                            }}
+                                                        >
+                                                           Email is not registred ! Check your email !
+                                                        </div>
+                                                    </Alert>
+                                                )}
+
                                                 <div className="mb-3">
-                                                    <input type="email" className="form-control form-control-lg form-SignIn" placeholder="Password" aria-label="Password" />
+                                                    <input type="password" className="form-control form-control-lg form-SignIn" placeholder="Password" aria-label="Password" name="password" value={password} onChange={(e) => setpassword(e.target.value)} required />
                                                 </div>
-                                                <div className="form-check form-switch">
-                                                    <input className="form-check-input" type="checkbox" id="rememberMe" />
-                                                    <label className="form-check-label" htmlFor="rememberMe">Remember me</label>
-                                                </div>
-                                                <div className="text-center">
-                                                    <button type="button" className="btn btn-lg btn-lg w-100 mt-4 mb-0 btn-signIn">Sign in</button>
-                                                </div>
+                                                
+                                                {PasswordErrorMessage && (
+                                                    <Alert variant="danger" className="mt-1">
+                                                        <div
+                                                            className="form-icon-wrapper"
+                                                            style={{
+                                                                height: "20px",
+                                                                fontSize: "14px",
+                                                                marginTop: "-11px",
+                                                                marginBottom: "-13px",
+                                                                fontWeight: "bold"
+
+                                                            }}
+                                                        >
+                                                           Password is incorrect ! Check your password !
+                                                        </div>
+                                                    </Alert>
+                                                )}
+
+                                                <Button variant="primary" onClick={() => login()} >
+                                                    Sign In
+                                                </Button>
                                             </form>
                                         </div>
                                         <div className="card-footer text-center pt-0 px-lg-2 px-1 card-signIn">
