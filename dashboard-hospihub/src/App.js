@@ -10,6 +10,8 @@ import ListServicesComponent from './Components/AdmindashboardComponents/ListSer
 import DashboardAdmin from './Components/AdmindashboardComponents/DashboardAdmin';
 import ListDoctorUnvalidated from './Components/AdmindashboardComponents/UnvalidatedDoctors';
 import SideBarAdmin from './Components/AdmindashboardComponents/sideBarComponent';
+import ListDoctors from './Components/AdmindashboardComponents/ListDoctorsValidated';
+import AddNewService from './Components/AdmindashboardComponents/Add newService';
 
 function App() {
   return (
@@ -31,6 +33,10 @@ function App() {
    <Route path='/DashboardAdmin' element={<DashboardAdmin></DashboardAdmin>}></Route>
    <Route path='/ListServices' element={<ListServicesComponent></ListServicesComponent>}></Route>
    <Route path='/UnvalidatedDoctors' element={<ListDoctorUnvalidated></ListDoctorUnvalidated>}></Route>
+   <Route path='/listDoctors' element={<ListDoctors></ListDoctors>}></Route>
+   <Route path='/AddnewService' element={<AddNewService></AddNewService>}></Route>
+
+
    </Routes>
    </>  
   );

@@ -39,6 +39,14 @@ function SideBarAdmin(props) {
             <span className="nav-link-text ms-1">Unvalidated Doctors</span>
           </NavLink>
         </li>
+        <li className="/nav-item">
+          <NavLink to="/listDoctors"   className="nav-link">
+            <div className="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+              <i className="ni ni-single-02 text-dark text-sm opacity-10" />
+            </div>
+            <span className="nav-link-text ms-1">Doctors</span>
+          </NavLink>
+        </li>
           </ul>
         </div>      
       </aside>

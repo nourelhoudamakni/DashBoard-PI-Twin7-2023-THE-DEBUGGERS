@@ -1,5 +1,22 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faLock, faSign } from "@fortawesome/free-solid-svg-icons";
+import { Button } from "react-bootstrap";
 function DashboardSuperAdmin() {
+  const navigate = useNavigate()
+  const logOut = () => {
+    localStorage.clear();
+
+    // Vider les cookies
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i];
+      const eqPos = cookie.indexOf('=');
+      const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+      document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
+    }
+    navigate("/signIn")
+  }
     return ( 
         <>
          <div>
@@ -43,19 +60,20 @@ function DashboardSuperAdmin() {
           </div>      
         </aside>
         <main className="main-content position-relative border-radius-lg ">
-          {/* Navbar */}
-          <nav className="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl " id="navbarBlur" data-scroll="false">
+         {/* Navbar */}
+         <nav className="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl " id="navbarBlur" data-scroll="false">
             <div className="container-fluid py-1 px-3">
-             
-              <div className="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
-                
-                <ul className="navbar-nav  justify-content-end">
-                  <li className="nav-item d-flex align-items-center">
-                    <a href="javascript:;" className="nav-link text-white font-weight-bold px-0">
-                      <i className="fa fa-user me-sm-1" />
-                      <span className="d-sm-inline d-none">Sign In</span>
-                    </a>
-                  </li>
+
+              <div className="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4 justify-content-end" id="navbar">
+
+                <ul className="navbar-nav  ">
+                <li className="nav-item d-flex align-items-center">
+                                        <a href="javascript:;" className="nav-link text-white font-weight-bold px-0 pt-3 ">
+                                            <Button variant="primary"  onClick={()=>{logOut()}}>
+                                                <FontAwesomeIcon icon={faLock} className="px-2" />Log Out
+                                            </Button>
+                                        </a>
+                                    </li>
                   <li className="nav-item d-xl-none ps-3 d-flex align-items-center">
                     <a href="javascript:;" className="nav-link text-white p-0" id="iconNavbarSidenav">
                       <div className="sidenav-toggler-inner">
@@ -80,6 +98,7 @@ function DashboardSuperAdmin() {
             </div>
           </nav>
           {/* End Navbar */}
+
 
 
           <div className="container-fluid py-4">

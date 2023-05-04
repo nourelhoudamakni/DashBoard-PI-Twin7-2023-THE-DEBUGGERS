@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClose, faPencil, faPlus, faTrash, faLock } from "@fortawesome/free-solid-svg-icons";
 import Button from 'react-bootstrap/Button';
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useParams } from "react-router-dom";
 import { Nav } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -10,25 +10,13 @@ import SideBarAdmin from "./sideBarComponent";
 import jwt_decode from "jwt-decode";
 
 function ListDoctorUnvalidated(props) {
-
+    const {idService}=useParams()
     const navigate = useNavigate()
     const [doctors, setdoctors] = useState([])
     const [Hospital, setHospital] = useState({})
 
 
     useEffect(() => {
-        axios.get('http://localhost:5000/admin/getdoctorsconfirmednonvalidated')
-            .then((response) => {
-                console.log(response.data)
-                setdoctors(response.data)
-            })
-            .catch((error) => {
-                if (error.response.data.errors) {
-                    console.log(error.response.data.errors)
-                }
-            })
-        console.log(doctors)
-
 
         const token = localStorage.getItem('jwtToken');
         if (token) {
@@ -44,9 +32,22 @@ function ListDoctorUnvalidated(props) {
                     }
                 })
 
-        }
 
+        axios.get(`http://localhost:5000/admin/getdoctorsconfirmednonvalidated/${decodedToken.id}`)
+        .then((response) => {
+            console.log(response.data)
+            setdoctors(response.data)
+        })
+        .catch((error) => {
+            if (error.response.data.errors) {
+                console.log(error.response.data.errors)
+            }
+        })
+        console.log(doctors)
+        }
+        
     }, []);
+
 
     const validateDoctor = (id) => {
         console.log(id)
@@ -151,51 +152,46 @@ function ListDoctorUnvalidated(props) {
                                                         <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-9 ps-2">Last Name</th>
                                                         <th className="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-9">Email </th>
                                                         <th className="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-9">phone number</th>
-                                                        <th className="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-9">workTime</th>
-                                                        <th className="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-9">state</th>
+                                                        <th className="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-9">Action</th>
 
-                                                        <th className="text-secondary opacity-7" />
+                                                       
                                                     </tr>
                                                 </thead>
                                                 {
                                                     doctors.map((e) => {
-                                                        return (
-                                                            <>
-                                                                <tbody>
-                                                                    <tr>
-                                                                        <td>
-                                                                            <div className="d-flex px-2 py-1">
-                                                                                <div className="d-flex flex-column justify-content-center">
-                                                                                    <p className="text-xs font-weight-bold mb-0 ps-2">{e.firstName}</p>
-                                                                                </div>
+     
+                                                         return (
+
+                                                        <>                                                    
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>
+                                                                        <div className="d-flex px-2 py-1">
+                                                                            <div className="d-flex flex-column justify-content-center">
+                                                                                <p className="text-xs font-weight-bold mb-0 ps-2">{e.firstName}</p>
                                                                             </div>
-                                                                        </td>
-                                                                        <td>
-                                                                            <p className="text-xs font-weight-bold mb-0">{e.lastName}</p>
-                                                                        </td>
-                                                                        <td className="align-middle text-center text-sm">
-                                                                            <p className="text-xs font-weight-bold mb-0">{e.email}</p>
-                                                                        </td>
-                                                                        <td className="align-middle text-center text-sm">
-                                                                            <p className="text-xs font-weight-bold mb-0">{e.phoneNumber}</p>
-                                                                        </td>
-                                                                        <td className="align-middle text-center text-sm">
-                                                                            <p className="text-xs font-weight-bold mb-0">{e.WorkTime}</p>
-                                                                        </td>
-                                                                        <td className="align-middle text-center text-sm">
-                                                                            <Button variant="success" onClick={() => validateDoctor(e._id)}>
-                                                                                <FontAwesomeIcon icon={faPlus} /> Validate
-                                                                            </Button>
-                                                                        </td>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <p className="text-xs font-weight-bold mb-0">{e.lastName}</p>
+                                                                    </td>
+                                                                    <td className="align-middle text-center text-sm">
+                                                                        <p className="text-xs font-weight-bold mb-0">{e.email}</p>
+                                                                    </td>
+                                                                    <td className="align-middle text-center text-sm">
+                                                                        <p className="text-xs font-weight-bold mb-0">{e.phoneNumber}</p>
+                                                                    </td>
+                                                                  
+                                                                    <td className="align-middle text-center text-sm">
+                                                                        <Button variant="success" onClick={() => validateDoctor(e._id)}>
+                                                                            <FontAwesomeIcon icon={faPlus} /> Validate
+                                                                        </Button>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
 
-
-                                                                    </tr>
-
-                                                                </tbody>
-
-                                                            </>
-                                                        )
-                                                    })
+                                                        </>
+                                                  )})
                                                 }
 
                                             </table>

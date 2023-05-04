@@ -51,7 +51,7 @@ function HospitalListComponent(props) {
         <>
              <div>
              <div className="position-absolute w-100 min-height-300 top-0 " style={{ backgroundImage: 'url("assets/images/admin.jpg")', backgroundPosition: 'center', backgroundSize: 'cover', opacity: 0.9 }}></div>
-
+{/* 
              {!ModalShow && <aside className="sidenav  navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-4 " id="sidenav-main">
                     <div className="sidenav-header">
                         <i className="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav" />
@@ -90,7 +90,7 @@ function HospitalListComponent(props) {
                         </ul>
                     </div>
                 </aside>
-            }
+            } */}
 
 
                 <main className="main-content position-relative border-radius-lg ">
@@ -190,6 +190,7 @@ function HospitalListComponent(props) {
                                                                         <td className="align-middle  ">
                                                                             <Button variant="danger" className="mx-2" onClick={() => {setidHospitalToDelete(e._id);setModalShow(true)}}>
                                                                                 <FontAwesomeIcon icon={faTrash} />
+                                                                                
                                                                             </Button>
                                                                             <Button variant="success" onClick={()=>navigate(`/UpdateHospital/${e._id}`)}>
                                                                                 <FontAwesomeIcon icon={faPencil} />

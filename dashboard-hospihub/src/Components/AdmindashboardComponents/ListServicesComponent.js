@@ -16,10 +16,14 @@ function ListServicesComponent() {
     const [Hospital, setHospital] = useState({})
     const [AddServiceModalShow, setAddServiceModalShow] = useState(false)
     const servicesList = ["médecine générale", "immunologie", "radiologie", "chirurgie", "neurologie", "pneumologie", "cardiologie", "odontologie", "dermatologie", "service accueil de traitement des urgences"
-        , " traumatologie", "  médecine interne", "endocrinologie", " anatomo-pathologie", " hématologie", " gastro-entérologie", "urologie", "pharmacie", "maternité", "Pédiatrie"
-        , "Service des grands brûlés"]
+    , " traumatologie", "  médecine interne", "endocrinologie", " anatomo-pathologie", " hématologie", " gastro-entérologie", "urologie", "pharmacie", "maternité", "Pédiatrie"
+    , "Service des grands brûlés"]
 
-    const [newService, setnewService] = useState({})
+    const [newService, setnewService] = useState({
+        ServiceName:"",
+        Description:"",
+        EmailService:""
+    })
     const [requiredName, setrequiredName] = useState(false)
     const [requiredDescription, setrequiredDescription] = useState(false)
     const [requiredEmailService, setrequiredEmailService] = useState(false)
@@ -32,11 +36,10 @@ function ListServicesComponent() {
     const [Doctors, setDoctors] = useState([])
     const [ErrorMail,setErrorMail]=useState(false)
     const [ErrorName,setErrorName]=useState(false)
+    const[ErrorRequired,setErrorRequired]=useState(false)
+    const[ShowErrorMessage,setShowErrorMessage]=useState(false)
 
-    const onValueChange = (e) => {
-        e.preventDefault()
-        setnewService({ ...newService, [e.target.name]: e.target.value })
-    }
+   
     const { ServiceName, Description, EmailService } = updateService
 
     const onHandleChange = (e) => {
@@ -78,6 +81,12 @@ function ListServicesComponent() {
     }, []);
 
     const addNewService = () => {
+        console.log(newService)
+        if(newService.ServiceName==="" || newService.Description===""|| newService.EmailService===""){
+            setShowErrorMessage(true)
+        }
+        else{
+
         axios.post(`http://localhost:5000/service/addservice/${Hospital._id}`, newService)
             .then((response) => {
                 console.log(response.data)
@@ -85,21 +94,28 @@ function ListServicesComponent() {
                     .then((response) => {
                         console.log(response.data)
                         setServices(response.data)
+                        setAddServiceModalShow(false)
+                        setErrorName(false)
+                        setErrorMail(false)
+                        setShowErrorMessage(false)
                     })
             })
             .catch((error) => {
 
                 if (error.response.data.errors.name) {
                  setErrorName(true)
-                
+                 setErrorMail(false)
                 }
+               
                 if (error.response.data.errors.email) {
-                 
                     setErrorMail(true)
+                    setErrorName(false)
                 }
                console.log(ErrorMail)
 
             })
+        }
+        
     }
     const finServicebyId = async (id) => {
         await axios.get(`http://localhost:5000/service/getServiceById/${id}`)
@@ -243,12 +259,12 @@ function ListServicesComponent() {
                                     <input type="text" className="form-control" placeholder="Type here..." />
                                 </div>
                             </div>
-                            <div className="col-12 mt-2">
+                            <div className="col-12 mt-2 ">
                                 <div className="card mb-4">
                                     <div className="card-header pb-0 d-flex justify-content-between">
                                         <h6>List of {Hospital.HospitalName} hospital services</h6>
 
-                                        <Button variant="primary" onClick={() => setAddServiceModalShow(true)} >
+                                        <Button variant="success" onClick={() => navigate("/AddnewService")} >
                                             <FontAwesomeIcon icon={faPlus} /> Add New Service
                                         </Button>
 
@@ -263,6 +279,7 @@ function ListServicesComponent() {
                                                         <th className="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-9">Email Service</th>
 
                                                         <th className="text-secondary opacity-7" />
+                                                       
                                                     </tr>
                                                 </thead>
 
@@ -293,16 +310,21 @@ function ListServicesComponent() {
                                                                             <Button variant="danger" className="mx-2" onClick={() => { setshowModelDelete(!showModelDelete) }}>
                                                                                 <FontAwesomeIcon icon={faTrash} />
                                                                             </Button>
-                                                                            <Button variant="success" onClick={() => { setidService(e._id); finServicebyId(e._id); setshowUpdate(!showUpdate) }} >
+                                                                            <Button variant="warning" onClick={() => { setidService(e._id); finServicebyId(e._id); setshowUpdate(!showUpdate) }} >
                                                                                 <FontAwesomeIcon icon={faPencil} />
                                                                             </Button>
-                                                                            <Button variant="warning" className="mx-2" onClick={() => { setshowModelList(!showModelList); getAllDoctors(e._id) }} >
-                                                                                <FontAwesomeIcon icon={faList} /> Doctors List
-                                                                            </Button>
+                                                                           
+                                                                         
+                                                                       
+                                                                        
+                                                                     
+                                                                            
                                                                         </td>
+                                                                       
                                                                     </tr>
 
                                                                 </tbody>
+{/* /////////////////////////////////////////////////////////////////////// model delete */}
                                                                 <Modal
 
                                                                     aria-labelledby="contained-modal-title-vcenter"
@@ -327,237 +349,11 @@ function ListServicesComponent() {
                                                                         </Button>
                                                                     </Modal.Footer>
                                                                 </Modal>
-
-
-
-                                                                <Modal
-                                                                    aria-labelledby="contained-modal-title-vcenter"
-                                                                    centered
-                                                                    show={showModelList}
-                                                                    onHide={() => setshowModelList(false)}
-                                                                    size="lg"
-                                                                >
-                                                                    <Modal.Header closeButton>
-                                                                        <Modal.Title id="contained-modal-title-vcenter">
-                                                                            List Doctors of {e.ServiceName} Service
-                                                                        </Modal.Title>
-                                                                    </Modal.Header>
-                                                                    <Modal.Body>
-
-
-                                                                        <div className="table-responsive p-0">
-                                                                            <table className="table align-items-center mb-0">
-                                                                                <thead>
-                                                                                    <tr>
-                                                                                        <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-9"> First Name</th>
-                                                                                        <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-9 ps-2">Last Name</th>
-                                                                                        <th className="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-9">Email </th>
-                                                                                        <th className="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-9">phone number</th>
-                                                                                        <th className="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-9">workTime</th>
-                                                                                        <th className="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-9">state</th>
-
-                                                                                        <th className="text-secondary opacity-7" />
-                                                                                    </tr>
-                                                                                </thead>
-
-                                                                                {
-                                                                                    Doctors.map((e) => {
-                                                                                        return (
-                                                                                            <>
-                                                                                                <tbody>
-                                                                                                    <tr>
-                                                                                                        <td>
-                                                                                                            <div className="d-flex px-2 py-1">
-                                                                                                                <div className="d-flex flex-column justify-content-center">
-                                                                                                                    <p className="text-xs font-weight-bold mb-0 ps-2">{e.firstName}</p>
-                                                                                                                </div>
-                                                                                                            </div>
-                                                                                                        </td>
-                                                                                                        <td>
-                                                                                                            <p className="text-xs font-weight-bold mb-0">{e.lastName}</p>
-                                                                                                        </td>
-                                                                                                        <td className="align-middle text-center text-sm">
-                                                                                                            <p className="text-xs font-weight-bold mb-0">{e.email}</p>
-                                                                                                        </td>
-                                                                                                        <td className="align-middle text-center text-sm">
-                                                                                                            <p className="text-xs font-weight-bold mb-0">{e.phoneNumber}</p>
-                                                                                                        </td>
-                                                                                                        <td className="align-middle text-center text-sm">
-                                                                                                            <p className="text-xs font-weight-bold mb-0">{e.WorkTime}</p>
-                                                                                                        </td>
-                                                                                                        <td className="align-middle text-center text-sm">
-                                                                                                            <p className="text-xs font-weight-bold mb-0">{e.IsValidated}</p>
-                                                                                                        </td>
-                                                                                                    </tr>
-
-                                                                                                </tbody>
-                                                                                            </>
-                                                                                        )
-                                                                                    })}
-                                                                            </table>
-                                                                        </div>
-
-                                                                    </Modal.Body >
-                                                                    <Modal.Footer>
-                                                                        <Button variant="secondary" onClick={() => { setshowModelList(false) }}>
-                                                                            <FontAwesomeIcon icon={faClose}></FontAwesomeIcon> Close
-                                                                        </Button>
-                                                                        <Button variant="primary" onClick={() => { setshowModelList(false) }}>
-                                                                            Confirm
-                                                                        </Button>
-                                                                    </Modal.Footer>
-                                                                </Modal>
-
+                                                                
                                                             </>
                                                         )
                                                     })}
-
-
                                             </table >
-                                            <Modal
-                                                aria-labelledby="contained-modal-title-vcenter"
-                                                centered
-                                                show={AddServiceModalShow}
-                                                onHide={() => setAddServiceModalShow(false)}
-                                            >
-                                                <Modal.Header closeButton>
-                                                    <Modal.Title id="contained-modal-title-vcenter">
-                                                        Add New Service
-                                                    </Modal.Title>
-                                                </Modal.Header>
-                                                <Modal.Body>
-                                                    <label htmlFor="example-text-input" className="form-control-label">Service Name</label>
-                                                    <select className="form-control bg-light p-1 m-1" name='ServiceName' onChange={(e) => onValueChange(e)} onBlur={() => setrequiredName(/^\s*$/.test(newService.ServiceName))}>
-                                                        <option value="" selected className="text-sm">Select Service Name</option>
-                                                        {servicesList.map((serv) => (
-                                                            <option value={serv}>
-                                                                {serv}
-                                                            </option>
-                                                        ))}
-                                                    </select>
-                                                    {requiredName && (
-                                                        <Alert variant="danger" className="mt-1">
-                                                            <div
-                                                                className="form-icon-wrapper"
-                                                                style={{
-                                                                    height: "20px",
-                                                                    fontSize: "14px",
-                                                                    marginTop: "-11px",
-                                                                    marginBottom: "-13px",
-                                                                    fontWeight: "bold"
-
-                                                                }}
-                                                            >
-                                                                Service name is required!
-                                                            </div>
-                                                        </Alert>
-                                                    )}
-                                                    {ErrorName && (
-                                                        <Alert variant="danger" className="mt-1">
-                                                            <div
-                                                                className="form-icon-wrapper"
-                                                                style={{
-                                                                    height: "20px",
-                                                                    fontSize: "14px",
-                                                                    marginTop: "-11px",
-                                                                    marginBottom: "-13px",
-                                                                    fontWeight: "bold"
-
-                                                                }}
-                                                            >
-                                                                Service name is already exist!
-                                                            </div>
-                                                        </Alert>
-                                                    )}
-                                                    <div className="form-group">
-                                                        <label htmlFor="example-text-input" className="form-control-label" >Description</label>
-                                                        <textarea className="form-control" type="text" required name='Description' onChange={(e) => onValueChange(e)} onBlur={() => setrequiredDescription(/^\s*$/.test(newService.Description))} />
-                                                    </div>
-                                                    {requiredDescription && (
-                                                        <Alert variant="danger" className="mt-1">
-                                                            <div
-                                                                className="form-icon-wrapper"
-                                                                style={{
-                                                                    height: "20px",
-                                                                    fontSize: "14px",
-                                                                    marginTop: "-11px",
-                                                                    marginBottom: "-13px",
-                                                                    fontWeight: "bold"
-
-                                                                }}
-                                                            >
-                                                                Description is required!
-                                                            </div>
-                                                        </Alert>
-                                                    )}
-                                                    <div className="form-group">
-                                                        <label htmlFor="example-text-input" className="form-control-label">Email Service</label>
-                                                        <input className="form-control" type="email" name="EmailService" onChange={(e) => onValueChange(e)} required onBlur={() => { setrequiredEmailService(/^\s*$/.test(newService.EmailService)); setemailverifform(!/^[a-zA-Z]\.[a-zA-Z]+@gmail\.com$/.test(newService.EmailService)) }} />
-                                                    </div>
-                                                    {requiredEmailService && (
-                                                        <Alert variant="danger" className="mt-1">
-                                                            <div
-                                                                className="form-icon-wrapper"
-                                                                style={{
-                                                                    height: "20px",
-                                                                    fontSize: "14px",
-                                                                    marginTop: "-11px",
-                                                                    marginBottom: "-13px",
-                                                                    fontWeight: "bold"
-
-                                                                }}
-                                                            >
-                                                                Email service is required!
-                                                            </div>
-                                                        </Alert>
-                                                    )}
-                                                    {emailverifform && (
-                                                        <Alert variant="danger" className="mt-1">
-                                                            <div
-                                                                className="form-icon-wrapper"
-                                                                style={{
-                                                                    height: "40px",
-                                                                    fontSize: "14px",
-                                                                    marginTop: "-11px",
-                                                                    marginBottom: "-13px",
-                                                                    fontWeight: "bold"
-
-                                                                }}
-                                                            >
-                                                                Email Service invalid you must have this format ServiceName+hospitalname+@gmail.com
-                                                            </div>
-                                                        </Alert>
-                                                    )}
-                                                    {ErrorMail && (
-                                                        <Alert variant="danger" className="mt-1">
-                                                            <div
-                                                                className="form-icon-wrapper"
-                                                                style={{
-                                                                    height: "20px",
-                                                                    fontSize: "14px",
-                                                                    marginTop: "-11px",
-                                                                    marginBottom: "-13px",
-                                                                    fontWeight: "bold"
-
-                                                                }}
-                                                            >
-                                                                Email is already exist!
-                                                            </div>
-                                                        </Alert>
-                                                    )}
-
-                                                </Modal.Body>
-                                                <Modal.Footer>
-                                                    <Button variant="secondary" onClick={() => { setAddServiceModalShow(false) }}>
-                                                        <FontAwesomeIcon icon={faClose}></FontAwesomeIcon> Close
-                                                    </Button>
-                                                    <Button variant="primary" onClick={() => { addNewService(); setAddServiceModalShow(false) }}>
-                                                        Confirm
-                                                    </Button>
-                                                </Modal.Footer>
-                                            </Modal>
-
-
 
                                         </div>
                                     </div>
@@ -565,6 +361,7 @@ function ListServicesComponent() {
                             </div>
                         </div>
 
+{/* /////////////////////////////////////////////////////////////////////// model  update service    */}
 
                         {showUpdate && <div className="col-12 mt-2 ">
                             <div className="card mb-4 container">
