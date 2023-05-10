@@ -120,28 +120,7 @@ function ListDoctors() {
     }
 
 
-    const deleteUser = () => {
-        const token = localStorage.getItem('jwtToken');
-        const decodedToken = jwt_decode(token);
 
-        axios.delete(`http://localhost:5000/accountStatus/deleteUser/${idUserToDelete}`)
-            .then((response) => {
-                console.log(response.data)
-                axios.get(`http://localhost:5000/admin/getDoctorsConfirmedValidatedbyIdHspital/${decodedToken._id}`)
-                    .then((response) => {
-
-                        setDoctors(response.data)
-
-                    })
-
-            })
-            .catch((error) => {
-
-                if (error.response.data.message) {
-                    console.log(error.response.data.message)
-                }
-            })
-    }
 
     const blockUser = () => {
         const token = localStorage.getItem('jwtToken');
@@ -218,29 +197,7 @@ function ListDoctors() {
 
     return (
         <>
-            {/* /////////////////////////////////////////////////////////////////////// model delete */}
-            <Modal
-                centered
-                show={showModelDelete}
-                onHide={() => setshowModelDelete(false)}
-            >
-                <Modal.Header closeButton>
-                    <Modal.Title id="contained-modal-title-vcenter">
-                        Confirmation
-                    </Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <p>Confirm if you want to delete this element</p>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => { setshowModelDelete(false) }}>
-                        <FontAwesomeIcon icon={faClose}></FontAwesomeIcon> Close
-                    </Button>
-                    <Button variant="primary" onClick={() => { deleteUser(); setshowModelDelete(false) }}>
-                        Confirm
-                    </Button>
-                </Modal.Footer>
-            </Modal>
+  
             {/* /////////////////////////////////////////////////////////////////////// model block */}
             <Modal
                 centered
@@ -438,17 +395,16 @@ function ListDoctors() {
                                                                         </p>
                                                                     </td>
                                                                     <td className="  ">
-                                                                        <Button variant="danger" className="mx-2" onClick={() => { setidUserToDelete(e._id); setshowModelDelete(true) }} title="Delete doctor">
-                                                                            <FontAwesomeIcon icon={faTrash} />
-                                                                        </Button>
-                                                                        <Button variant="warning" onClick={() => { setidUserToblock(e._id); setshowModelBlock(true) }} title="Block doctor">
-                                                                            <FontAwesomeIcon icon={faLock} />
-                                                                        </Button>
+                                                                   
 
                                                                         <Button variant="success" className="mx-2" onClick={() => { setidUserToActive(e._id); setshowModelActive(true) }} title="Activate doctor" >
                                                                             <FontAwesomeIcon icon={faCheck} />
                                                                         </Button>
-                                                                        <Button variant="secondary" className="" onClick={() => { setidUserToArchive(e._id); setshowModelArchive(true) }} title="Archive doctor" >
+                                                                        
+                                                                        <Button variant="warning" onClick={() => { setidUserToblock(e._id); setshowModelBlock(true) }} title="Block doctor">
+                                                                            <FontAwesomeIcon icon={faLock} />
+                                                                        </Button>
+                                                                        <Button variant="secondary" className="mx-2" onClick={() => { setidUserToArchive(e._id); setshowModelArchive(true) }} title="Archive doctor" >
                                                                             <FontAwesomeIcon icon={faHistory} />
                                                                         </Button>
 
