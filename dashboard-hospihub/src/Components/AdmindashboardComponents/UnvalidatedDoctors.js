@@ -50,11 +50,15 @@ function ListDoctorUnvalidated(props) {
 
 
     const validateDoctor = (id) => {
+
+        const token = localStorage.getItem('jwtToken');
+        if (token) {
+        const decodedToken = jwt_decode(token);
         console.log(id)
         axios.put(`http://localhost:5000/admin/validatedoctor/${id}`)
             .then((response) => {
                 console.log(response.data)
-                axios.get('http://localhost:5000/admin/getdoctorsconfirmednonvalidated')
+                axios.get(`http://localhost:5000/admin/getdoctorsconfirmednonvalidated/${decodedToken.id}`)
                     .then((response) => {
                         console.log(response.data)
                         setdoctors(response.data)
@@ -66,6 +70,7 @@ function ListDoctorUnvalidated(props) {
                     console.log(error.response.data.errors)
                 }
             })
+        }
 
     }
 

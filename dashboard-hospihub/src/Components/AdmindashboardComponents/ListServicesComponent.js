@@ -16,13 +16,13 @@ function ListServicesComponent() {
     const [Hospital, setHospital] = useState({})
     const [AddServiceModalShow, setAddServiceModalShow] = useState(false)
     const servicesList = ["médecine générale", "immunologie", "radiologie", "chirurgie", "neurologie", "pneumologie", "cardiologie", "odontologie", "dermatologie", "service accueil de traitement des urgences"
-    , " traumatologie", "  médecine interne", "endocrinologie", " anatomo-pathologie", " hématologie", " gastro-entérologie", "urologie", "pharmacie", "maternité", "Pédiatrie"
-    , "Service des grands brûlés"]
+        , " traumatologie", "  médecine interne", "endocrinologie", " anatomo-pathologie", " hématologie", " gastro-entérologie", "urologie", "pharmacie", "maternité", "Pédiatrie"
+        , "Service des grands brûlés"]
 
     const [newService, setnewService] = useState({
-        ServiceName:"",
-        Description:"",
-        EmailService:""
+        ServiceName: "",
+        Description: "",
+        EmailService: ""
     })
     const [requiredName, setrequiredName] = useState(false)
     const [requiredDescription, setrequiredDescription] = useState(false)
@@ -34,17 +34,18 @@ function ListServicesComponent() {
     const [updateService, setupdateService] = useState({})
     const [showModelList, setshowModelList] = useState(false)
     const [Doctors, setDoctors] = useState([])
-    const [ErrorMail,setErrorMail]=useState(false)
-    const [ErrorName,setErrorName]=useState(false)
-    const[ErrorRequired,setErrorRequired]=useState(false)
-    const[ShowErrorMessage,setShowErrorMessage]=useState(false)
+    const [ErrorMail, setErrorMail] = useState(false)
+    const [ErrorName, setErrorName] = useState(false)
+    const [ErrorRequired, setErrorRequired] = useState(false)
+    const [ShowErrorMessage, setShowErrorMessage] = useState(false)
+    const [IdServicetodelete, setIdServicetodelete] = useState("")
 
-   
     const { ServiceName, Description, EmailService } = updateService
 
     const onHandleChange = (e) => {
         e.preventDefault()
         setupdateService({ ...updateService, [e.target.name]: e.target.value })
+        console.log(updateService)
     }
     useEffect(() => {
         const token = localStorage.getItem('jwtToken');
@@ -80,43 +81,6 @@ function ListServicesComponent() {
 
     }, []);
 
-    const addNewService = () => {
-        console.log(newService)
-        if(newService.ServiceName==="" || newService.Description===""|| newService.EmailService===""){
-            setShowErrorMessage(true)
-        }
-        else{
-
-        axios.post(`http://localhost:5000/service/addservice/${Hospital._id}`, newService)
-            .then((response) => {
-                console.log(response.data)
-                axios.get(`http://localhost:5000/service/gethospitalservices/${Hospital._id}`)
-                    .then((response) => {
-                        console.log(response.data)
-                        setServices(response.data)
-                        setAddServiceModalShow(false)
-                        setErrorName(false)
-                        setErrorMail(false)
-                        setShowErrorMessage(false)
-                    })
-            })
-            .catch((error) => {
-
-                if (error.response.data.errors.name) {
-                 setErrorName(true)
-                 setErrorMail(false)
-                }
-               
-                if (error.response.data.errors.email) {
-                    setErrorMail(true)
-                    setErrorName(false)
-                }
-               console.log(ErrorMail)
-
-            })
-        }
-        
-    }
     const finServicebyId = async (id) => {
         await axios.get(`http://localhost:5000/service/getServiceById/${id}`)
             .then((response) => {
@@ -132,28 +96,40 @@ function ListServicesComponent() {
             })
     }
     const UpdateService = () => {
-        axios.put(`http://localhost:5000/service/updateservice/${idService}`, updateService)
+
+        if (updateService.ServiceName === "" || updateService.Description === "" || updateService.EmailService === "") {
+            setShowErrorMessage(true)
+        }
+
+        axios.put(`http://localhost:5000/service/updateservice/${idService}/${Hospital._id}`, updateService)
             .then((response) => {
                 console.log(response.data)
                 axios.get(`http://localhost:5000/service/gethospitalservices/${Hospital._id}`)
                     .then((response) => {
                         console.log(response.data)
                         setServices(response.data)
+
                     })
             })
             .catch((error) => {
 
-                if (error.response.data.message) {
-                    console.log(error.response.data.message)
-
-
+                if (error.response.data.errors.name) {
+                    setErrorName(true)
+                    setErrorMail(false)
                 }
+
+                if (error.response.data.errors.email) {
+                    setErrorMail(true)
+                    setErrorName(false)
+                }
+                console.log(ErrorMail)
+
             })
 
     }
 
-    const deleteService = (id) => {
-        axios.delete(`http://localhost:5000/service/deleteservice/${id}`)
+    const deleteService = () => {
+        axios.delete(`http://localhost:5000/service/deleteservice/${IdServicetodelete}`)
             .then((response) => {
                 console.log(response.data)
                 axios.get(`http://localhost:5000/service/gethospitalservices/${Hospital._id}`)
@@ -178,6 +154,7 @@ function ListServicesComponent() {
                 console.log(response.data)
                 setDoctors(response.data)
                 console.log(Doctors)
+                setshowUpdate(false) 
 
             })
             .catch((error) => {
@@ -200,6 +177,8 @@ function ListServicesComponent() {
         navigate("/signIn")
     }
 
+    
+
     return (
         <>
             <div>
@@ -216,9 +195,9 @@ function ListServicesComponent() {
 
                             <div className="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4 justify-content-end" id="navbar">
                                 <ul className="navbar-nav  justify-content-end">
-                                <li className="nav-item d-flex align-items-center">
+                                    <li className="nav-item d-flex align-items-center">
                                         <a href="javascript:;" className="nav-link text-white font-weight-bold px-0 pt-3 ">
-                                            <Button variant="primary"  onClick={()=>{logOut()}}>
+                                            <Button variant="primary" onClick={() => { logOut() }}>
                                                 <FontAwesomeIcon icon={faLock} className="px-2" />Log Out
                                             </Button>
                                         </a>
@@ -279,7 +258,7 @@ function ListServicesComponent() {
                                                         <th className="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-9">Email Service</th>
 
                                                         <th className="text-secondary opacity-7" />
-                                                       
+
                                                     </tr>
                                                 </thead>
 
@@ -307,52 +286,54 @@ function ListServicesComponent() {
                                                                         </td>
 
                                                                         <td className="align-middle  ">
-                                                                            <Button variant="danger" className="mx-2" onClick={() => { setshowModelDelete(!showModelDelete) }}>
+                                                                            <Button variant="danger" className="mx-2" onClick={() => { setshowModelDelete(!showModelDelete); setIdServicetodelete(e._id) }}>
                                                                                 <FontAwesomeIcon icon={faTrash} />
                                                                             </Button>
                                                                             <Button variant="warning" onClick={() => { setidService(e._id); finServicebyId(e._id); setshowUpdate(!showUpdate) }} >
                                                                                 <FontAwesomeIcon icon={faPencil} />
                                                                             </Button>
-                                                                           
-                                                                         
-                                                                       
-                                                                        
-                                                                     
-                                                                            
+
+
+
+
+
+
                                                                         </td>
-                                                                       
+
                                                                     </tr>
 
                                                                 </tbody>
-{/* /////////////////////////////////////////////////////////////////////// model delete */}
-                                                                <Modal
+                                                                {/* /////////////////////////////////////////////////////////////////////// model delete */}
 
-                                                                    aria-labelledby="contained-modal-title-vcenter"
-                                                                    centered
-                                                                    show={showModelDelete}
-                                                                    onHide={() => setshowModelDelete(false)}
-                                                                >
-                                                                    <Modal.Header closeButton>
-                                                                        <Modal.Title id="contained-modal-title-vcenter">
-                                                                            Confirmation
-                                                                        </Modal.Title>
-                                                                    </Modal.Header>
-                                                                    <Modal.Body>
-                                                                        <p>Confirm if you want to delete this element</p>
-                                                                    </Modal.Body>
-                                                                    <Modal.Footer>
-                                                                        <Button variant="secondary" onClick={() => { setshowModelDelete(false) }}>
-                                                                            <FontAwesomeIcon icon={faClose}></FontAwesomeIcon> Close
-                                                                        </Button>
-                                                                        <Button variant="primary" onClick={() => { deleteService(e._id); setshowModelDelete(false) }}>
-                                                                            Confirm
-                                                                        </Button>
-                                                                    </Modal.Footer>
-                                                                </Modal>
-                                                                
                                                             </>
                                                         )
                                                     })}
+
+                                                <Modal
+
+                                                    aria-labelledby="contained-modal-title-vcenter"
+                                                    centered
+                                                    show={showModelDelete}
+                                                    onHide={() => setshowModelDelete(false)}
+                                                >
+                                                    <Modal.Header closeButton>
+                                                        <Modal.Title id="contained-modal-title-vcenter">
+                                                            Confirmation
+                                                        </Modal.Title>
+                                                    </Modal.Header>
+                                                    <Modal.Body>
+                                                        <p>Confirm if you want to delete this element</p>
+                                                    </Modal.Body>
+                                                    <Modal.Footer>
+                                                        <Button variant="secondary" onClick={() => { setshowModelDelete(false) }}>
+                                                            <FontAwesomeIcon icon={faClose}></FontAwesomeIcon> Close
+                                                        </Button>
+                                                        <Button variant="primary" onClick={() => { deleteService(); setshowModelDelete(false) }}>
+                                                            Confirm
+                                                        </Button>
+                                                    </Modal.Footer>
+                                                </Modal>
+
                                             </table >
 
                                         </div>
@@ -361,7 +342,7 @@ function ListServicesComponent() {
                             </div>
                         </div>
 
-{/* /////////////////////////////////////////////////////////////////////// model  update service    */}
+                        {/* /////////////////////////////////////////////////////////////////////// model  update service    */}
 
                         {showUpdate && <div className="col-12 mt-2 ">
                             <div className="card mb-4 container">
@@ -370,9 +351,26 @@ function ListServicesComponent() {
                                 </div>
                                 <div className="card-body px-0 pt-0 pb-2">
                                     <div className="row ">
+                                    {ShowErrorMessage && (
+                                                <Alert variant="danger" className="mt-1">
+                                                    <div
+                                                        className="form-icon-wrapper"
+                                                        style={{
+                                                            height: "20px",
+                                                            fontSize: "14px",
+                                                            marginTop: "-11px",
+                                                            marginBottom: "-13px",
+                                                            fontWeight: "bold"
+
+                                                        }}
+                                                    >
+                                                        All fields are required !
+                                                    </div>
+                                                </Alert>
+                                            )}
                                         <div className="col-md-6 ">
                                             <label htmlFor="example-text-input" className="form-control-label">Service Name</label>
-                                            <select className="form-control bg-light p-1 m-1" name='ServiceName' onChange={(e) => onHandleChange(e)} value={ServiceName} onBlur={() => setrequiredName(/^\s*$/.test(ServiceName))}>
+                                            <select className="form-control bg-light p-1 m-1" name='ServiceName' onChange={(e) => onHandleChange(e)} value={ServiceName} onBlur={() => setrequiredName(updateService.ServiceName==="")}>
                                                 <option value="" selected className="text-sm">Select Service Name</option>
                                                 {servicesList.map((serv) => (
                                                     <option value={serv}>
@@ -397,11 +395,28 @@ function ListServicesComponent() {
                                                     </div>
                                                 </Alert>
                                             )}
+                                             {ErrorName && (
+                                                        <Alert variant="danger" className="mt-1">
+                                                            <div
+                                                                className="form-icon-wrapper"
+                                                                style={{
+                                                                    height: "20px",
+                                                                    fontSize: "14px",
+                                                                    marginTop: "-11px",
+                                                                    marginBottom: "-13px",
+                                                                    fontWeight: "bold"
+
+                                                                }}
+                                                            >
+                                                                service name  already exist!
+                                                            </div>
+                                                        </Alert>
+                                                    )}
                                         </div>
                                         <div className="col-md-6 ">
                                             <div className="form-group">
                                                 <label htmlFor="example-text-input" className="form-control-label">Email Service</label>
-                                                <input className="form-control" type="email" name="EmailService" onChange={(e) => onHandleChange(e)} value={EmailService} required onBlur={() => { setrequiredEmailService(/^\s*$/.test(EmailService)); setemailverifform(!/^[a-zA-Z]\.[a-zA-Z0-9]+@gmail\.com$/.test(EmailService)) }} />
+                                                <input className="form-control" type="email" name="EmailService" onChange={(e) => onHandleChange(e)} value={EmailService} required onBlur={() => { setrequiredEmailService(updateService.EmailService==="") }} />
                                             </div>
                                             {requiredEmailService && (
                                                 <Alert variant="danger" className="mt-1">
@@ -420,29 +435,42 @@ function ListServicesComponent() {
                                                     </div>
                                                 </Alert>
                                             )}
-                                            {emailverifform && (
-                                                <Alert variant="danger" className="mt-1">
-                                                    <div
-                                                        className="form-icon-wrapper"
-                                                        style={{
-                                                            height: "40px",
-                                                            fontSize: "14px",
-                                                            marginTop: "-11px",
-                                                            marginBottom: "-13px",
-                                                            fontWeight: "bold"
+                                            <small  style={{
+                                                                   
+                                                                   fontSize: "12px",
+                                                                   marginTop: "-11px",
+                                                                   marginBottom: "-13px",
+                                                                   fontWeight: "bold",
+                                                                   color:"red"
 
-                                                        }}
-                                                    >
-                                                        Email Service invalid you must have this format ServiceName+hospitalname+@gmail.com
-                                                    </div>
-                                                </Alert>
-                                            )}
+                                                               }}>*Email Service must have this format ServiceName.hospitalname+@gmail.com</small>
+
+
+                                                        {ErrorMail && (
+                                                        <Alert variant="danger" className="mt-1">
+                                                            <div
+                                                                className="form-icon-wrapper"
+                                                                style={{
+                                                                    height: "20px",
+                                                                    fontSize: "14px",
+                                                                    marginTop: "-11px",
+                                                                    marginBottom: "-13px",
+                                                                    fontWeight: "bold"
+
+                                                                }}
+                                                            >
+                                                                Email already exists!
+                                                            </div>
+                                                        </Alert>
+                                                    )}
+
+
                                         </div>
                                     </div>
                                     <div className="col-md-6 ">
                                         <div className="form-group">
                                             <label htmlFor="example-text-input" className="form-control-label" >Description</label>
-                                            <textarea className="form-control" type="text" required name='Description' onChange={(e) => onHandleChange(e)} value={Description} onBlur={() => setrequiredDescription(/^\s*$/.test(Description))} />
+                                            <textarea className="form-control" type="text" required name='Description' onChange={(e) => onHandleChange(e)} value={Description} onBlur={() => setrequiredDescription(updateService.Description==="")} />
                                         </div>
                                         {requiredDescription && (
                                             <Alert variant="danger" className="mt-1">
